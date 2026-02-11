@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>8Грамм · 8И</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 20% 30%, #0e2a1c, #05100a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 16px;
+      margin: 0;
+    }
+
+    .app {
+      max-width: 1100px;
+      width: 100%;
+      background: #11261b;
+      border-radius: 36px 36px 28px 28px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 0 1px #2c5433;
+      display: flex;
+      flex-direction: column;
+      height: 92vh;
+      max-height: 900px;
+      backdrop-filter: blur(2px);
+      transition: all 0.2s;
+    }
+
+    /* Шапка */
+    .header {
+      padding: 20px 26px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #ddf3d0;
+      border-bottom: 1px solid #34673f;
+    }
+    .header h1 {
+      font-weight: 650;
+      font-size: 1.9rem;
+      letter-spacing: -0.5px;
+      background: linear-gradient(145deg, #d4f0cc, #b1dcb0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .badge {
+      background: #1d452b;
+      padding: 8px 20px;
+      border-radius: 60px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #e6ffe0;
+      border: 1px solid #548b5a;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);
+    }
+
+    /* Экран входа */
+    .login {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0e1f15;
+      border-radius: 0 0 32px 32px;
+    }
+    .card {
+      background: #1a3526;
+      padding: 40px 32px;
+      border-radius: 48px 48px 32px 32px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 12px 0 #0b1f16, 0 8px 20px #00000050;
+      border: 1px solid #3d6b47;
+    }
+    .card h2 {
+      color: #f1ffee;
+      font-size: 2.2rem;
+      font-weight: 500;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+    .field {
+      margin-bottom: 24px;
+    }
+    .field label {
+      display: block;
+      color: #c8ecbc;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+      font-weight: 450;
+    }
+    .field input {
+      width: 100%;
+      padding: 16px 22px;
+      background: #0a1f14;
+      border: 1.5px solid #346f3f;
+      border-radius: 60px;
+      font-size: 1rem;
+      color: white;
+      outline: none;
+      transition: 0.25s;
+    }
+    .field input:focus {
+      border-color: #86c28b;
+      background: #143121;
+      box-shadow: 0 0 0 3px #274e33;
+    }
+    .btn {
+      background: #278f4a;
+      border: none;
+      color: white;
+      font-weight: 700;
+      padding: 16px 24px;
+      border-radius: 60px;
+      font-size: 1.15rem;
+      width: 100%;
+      cursor: pointer;
+      border-bottom: 4px solid #135a28;
+      transition: 0.12s;
+      letter-spacing: 0.5px;
+    }
+    .btn:hover {
+      background: #34aa57;
+      border-bottom-width: 2px;
+      transform: translateY(2px);
+    }
+    .error {
+      color: #ffc9b4;
+      background: #672e2e;
+      padding: 14px 20px;
+      border-radius: 60px;
+      margin-top: 24px;
+      text-align: center;
+      border-left: 8px solid #d44;
+    }
+
+    /* Чат (скрыт по умолчанию) */
+    .chat {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      background: #0e1f15;
+      border-radius: 0 0 32px 32px;
+    }
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scroll-behavior: smooth;
+    }
+    .msg {
+      background: #1e3e2b;
+      max-width: 80%;
+      padding: 16px 20px;
+      border-radius: 24px 24px 24px 6px;
+      color: #f2ffec;
+      word-wrap: break-word;
+      box-shadow: 0 6px 12px #00000030;
+      align-self: flex-start;
+      border: 1px solid #3f794b;
+      transition: 0.2s;
+    }
+    .msg.own {
+      background: #23633a;
+      align-self: flex-end;
+      border-radius: 24px 24px 6px 24px;
+      border-color: #63a36e;
+    }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .sender {
+      font-weight: 700;
+      color: #e2ffd6;
+      font-size: 0.9rem;
+    }
+    .time {
+      font-size: 0.65rem;
+      color: #c6e6c0;
+      margin-left: 12px;
+    }
+    .text {
+      font-size: 0.98rem;
+      line-height: 1.5;
+    }
+    .text a {
+      color: #c2ffb0;
+      text-decoration: underline;
+      word-break: break-word;
+    }
+    .msg-image {
+      max-width: 220px;
+      border-radius: 18px;
+      margin-top: 10px;
+      border: 2px solid #6aa06e;
+      box-shadow: 0 4px 10px black;
+    }
+    .admin-tools {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .admin-btn {
+      background: #2a4e39;
+      border: none;
+      color: #ffefcf;
+      font-size: 0.7rem;
+      padding: 6px 14px;
+      border-radius: 50px;
+      cursor: pointer;
+      border: 1px solid #789f7a;
+      transition: 0.1s;
+      font-weight: 600;
+    }
+    .admin-btn:hover {
+      background: #4b7a53;
+      color: white;
+    }
+
+    /* Панель отправки */
+    .send-panel {
+      background: #0f261c;
+      padding: 16px 20px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      border-top: 1px solid #32723e;
+      border-radius: 0 0 32px 32px;
+    }
+    .send-panel input[type="text"] {
+      flex: 1;
+      background: #102b1c;
+      border: 1.5px solid #3a7343;
+      border-radius: 60px;
+      padding: 15px 22px;
+      color: white;
+      font-size: 0.95rem;
+      outline: none;
+      transition: 0.2s;
+    }
+    .send-panel input[type="text"]:focus {
+      border-color: #81ba87;
+      background: #1b3d27;
+    }
+    .file-btn {
+      background: #226837;
+      padding: 12px 22px;
+      border-radius: 60px;
+      color: white;
+      font-size: 1.3rem;
+      line-height: 1;
+      cursor: pointer;
+      border-bottom: 3px solid #124d1f;
+      display: flex;
+      align-items: center;
+      transition: 0.1s;
+    }
+    .file-btn:hover {
+      background: #328f4b;
+    }
+    .file-btn input {
+      display: none;
+    }
+    .send-btn {
+      background: #278f4a;
+      border: none;
+      color: white;
+      padding: 14px 28px;
+      border-radius: 60px;
+      font-weight: 700;
+      cursor: pointer;
+      border-bottom: 4px solid #135a28;
+      font-size: 1rem;
+      transition: 0.1s;
+    }
+    .send-btn:hover {
+      background: #34aa57;
+      border-bottom-width: 2px;
+      transform: translateY(2px);
+    }
+
+    /* Блокировка */
+    .blocked-banner {
+      background: #733939;
+      color: #ffdcaa;
+      padding: 12px 24px;
+      margin: 0 20px 12px;
+      border-radius: 60px;
+      text-align: center;
+      font-weight: 500;
+      border-left: 6px solid #ffa05c;
+    }
+    .hidden {
+      display: none;
+    }
+
+    /* Подвал — всегда */
+    .footer {
+      text-align: center;
+      padding: 14px;
+      font-size: 0.9rem;
+      color: #d0f0c0;
+      background: #092015;
+      border-radius: 0 0 28px 28px;
+      font-style: italic;
+      border-top: 1px solid #3d6b4a;
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 480px) {
+      .app { height: 96vh; border-radius: 24px; }
+      .msg { max-width: 90%; }
+      .header h1 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <h1>8Грамм</h1>
+      <span class="badge">8И</span>
+    </div>
+
+    <!-- экран входа -->
+    <div id="loginScreen" class="login">
+      <div class="card">
+        <h2>вход</h2>
+        <div class="field">
+          <label>Имя</label>
+          <input type="text" id="first" placeholder="Иван" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>Фамилия</label>
+          <input type="text" id="last" placeholder="Петров" autocomplete="off">
+        </div>
+        <button id="loginBtn" class="btn">войти в 8Грамм</button>
+        <div id="loginErr" class="error" style="display: none;"></div>
+      </div>
+    </div>
+
+    <!-- экран чата -->
+    <div id="chatScreen" class="chat">
+      <div id="msgList" class="messages"></div>
+      <div id="blockedMsg" class="blocked-banner hidden">⛔ Вы заблокированы администратором</div>
+      <div class="send-panel">
+        <input type="text" id="msgInput" placeholder="Сообщение...">
+        <label class="file-btn">
+          📎
+          <input type="file" id="fileInput" accept="image/*">
+        </label>
+        <button id="sendBtn" class="send-btn">➤</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      Лучше 8Грамм чем МАКСИмум
+    </div>
+  </div>
+
+  <script type="module">
+    // ========== TTкодинг пашка баполярка ==========
+    const firebaseConfig = {
+  apiKey: "AIzaSyDEAuCid7tT-KY7ZH7UHGZxhfg5QIYzyQM",
+  authDomain: "gram-3cadc.firebaseapp.com",
+  projectId: "gram-3cadc",
+  storageBucket: "gram-3cadc.firebasestorage.app",
+  messagingSenderId: "251007276703",
+  appId: "1:251007276703:web:35837055404b0438ec74aa",
+  measurementId: "G-P8XPY508TZ"
+};
+    // ==========================================================
+
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, onSnapshot, serverTimestamp, limit } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ---------- состояние ----------
+    let currentUser = null;
+    let currentUserData = null;
+    let isAdmin = false;
+    let isBlocked = false;
+    let unsubscribeMessages = null;
+
+    const loginScreen = document.getElementById('loginScreen');
+    const chatScreen = document.getElementById('chatScreen');
+    const firstInput = document.getElementById('first');
+    const lastInput = document.getElementById('last');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginErr = document.getElementById('loginErr');
+    const msgList = document.getElementById('msgList');
+    const msgInput = document.getElementById('msgInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const fileInput = document.getElementById('fileInput');
+    const blockedMsg = document.getElementById('blockedMsg');
+
+    // ---------- безопасность ----------
+    const escape = (str) => str.replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+    const linkify = (text) => escape(text).replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+    const formatTime = (ts) => ts ? ts.toDate().toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' }) : '';
+
+    // ---------- вход / регистрация ----------
+    const showError = (msg) => { loginErr.style.display = 'block'; loginErr.textContent = msg; };
+    const sanitize = (s) => s.trim().replace(/\s+/g, ' ');
+
+    async function register() {
+      const firstName = sanitize(firstInput.value);
+      const lastName = sanitize(lastInput.value);
+      if (!firstName || !lastName) return showError('Введите имя и фамилию');
+      if (!currentUser) return showError('Ошибка авторизации');
+      
+      try {
+        const q = query(collection(db, 'users'), where('firstName', '==', firstName), where('lastName', '==', lastName));
+        const snap = await getDocs(q);
+        if (!snap.empty) return showError('Такое имя и фамилия уже заняты');
+        
+        const isAdminUser = (firstName === 'Павел' && lastName === 'Ворошилин');
+        const userDoc = {
+          firstName, lastName,
+          isAdmin: isAdminUser,
+          isBlocked: false,
+          createdAt: serverTimestamp(),
+          uid: currentUser.uid
+        };
+        await setDoc(doc(db, 'users', currentUser.uid), userDoc);
+        currentUserData = userDoc;
+        isAdmin = isAdminUser;
+        isBlocked = false;
+        enterChat();
+      } catch (e) {
+        console.error(e);
+        showError('Ошибка регистрации');
+      }
+    }
+
+    function enterChat() {
+      loginScreen.style.display = 'none';
+      chatScreen.style.display = 'flex';
+      blockedMsg.classList.toggle('hidden', !isBlocked);
+      msgInput.disabled = isBlocked;
+      sendBtn.disabled = isBlocked;
+      fileInput.disabled = isBlocked;
+      startMessagesListener();
+    }
+
+    // ---------- сообщения (base64 вместо Storage) ----------
+    async function sendMessage(text = null, base64 = null) {
+      if (isBlocked) { alert('Вы заблокированы'); return; }
+      if (!text && !base64) return;
+      try {
+        const msg = {
+          senderId: currentUser.uid,
+          senderName: `${currentUserData.firstName} ${currentUserData.lastName}`,
+          timestamp: serverTimestamp(),
+        };
+        if (text?.trim()) msg.text = text.trim().substring(0, 2000);
+        if (base64) msg.imageBase64 = base64;
+        await setDoc(doc(collection(db, 'messages')), msg);
+        msgInput.value = '';
+      } catch (e) { console.error(e); }
+    }
+
+    // ---------- загрузка фото → base64 (БЕЗ STORAGE) ----------
+    function fileToBase64(file) {
+      return new Promise((res, rej) => {
+        if (!file.type.startsWith('image/')) { alert('Только изображения'); rej(); return; }
+        if (file.size > 300 * 1024) { alert('Фото не больше 300 КБ'); rej(); return; }
+        const reader = new FileReader();
+        reader.onload = (e) => res(e.target.result);
+        reader.onerror = rej;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // ---------- отрисовка сообщения ----------
+    function renderMessage(msg) {
+      const div = document.createElement('div');
+      div.className = `msg ${msg.senderId === currentUser?.uid ? 'own' : ''}`;
+      
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.innerHTML = `<span class="sender">${escape(msg.senderName || '')}</span>
+                        <span class="time">${msg.timestamp ? formatTime(msg.timestamp) : ''}</span>`;
+      div.appendChild(meta);
+      
+      if (msg.text) {
+        const txt = document.createElement('div');
+        txt.className = 'text';
+        txt.innerHTML = linkify(msg.text);
+        div.appendChild(txt);
+      }
+      
+      if (msg.imageBase64) {
+        const img = document.createElement('img');
+        img.src = msg.imageBase64;
+        img.className = 'msg-image';
+        img.loading = 'lazy';
+        div.appendChild(img);
+      }
+
+      // ---- админ-панель ----
+      if (isAdmin && msg.senderId !== currentUser?.uid) {
+        const tools = document.createElement('div');
+        tools.className = 'admin-tools';
+        
+        const del = document.createElement('button');
+        del.className = 'admin-btn';
+        del.textContent = '🗑️ удалить';
+        del.onclick = () => deleteMessage(msg.id);
+        tools.appendChild(del);
+        
+        const block = document.createElement('button');
+        block.className = 'admin-btn';
+        block.textContent = '🔒 блокировка';
+        block.onclick = () => toggleBlock(msg.senderId);
+        tools.appendChild(block);
+        
+        const makeAdmin = document.createElement('button');
+        makeAdmin.className = 'admin-btn';
+        makeAdmin.textContent = '👑 сделать админом';
+        makeAdmin.onclick = () => setAdmin(msg.senderId, true);
+        tools.appendChild(makeAdmin);
+        
+        div.appendChild(tools);
+      }
+      
+      msgList.appendChild(div);
+    }
+
+    // ---------- админ-функции ----------
+    async function deleteMessage(id) {
+      if (!isAdmin) return;
+      try { await deleteDoc(doc(db, 'messages', id)); } catch (e) { console.error(e); }
+    }
+    async function toggleBlock(uid) {
+      if (!isAdmin) return;
+      try {
+        const ref = doc(db, 'users', uid);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          await updateDoc(ref, { isBlocked: !(snap.data().isBlocked || false) });
+        }
+      } catch (e) { console.error(e); }
+    }
+    async function setAdmin(uid, status) {
+      if (!isAdmin) return;
+      try { await updateDoc(doc(db, 'users', uid), { isAdmin: status }); } catch (e) { console.error(e); }
+    }
+
+    // ---------- слушатели ----------
+    function startMessagesListener() {
+      if (unsubscribeMessages) unsubscribeMessages();
+      const q = query(collection(db, 'messages'), orderBy('timestamp'), limit(100));
+      unsubscribeMessages = onSnapshot(q, (snap) => {
+        msgList.innerHTML = '';
+        snap.forEach(d => renderMessage({ id: d.id, ...d.data() }));
+        msgList.scrollTop = msgList.scrollHeight;
+      });
+    }
+
+    // ---------- анонимная аутентификация ----------
+    signInAnonymously(auth).catch(console.error);
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        const ref = doc(db, 'users', user.uid);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          currentUserData = snap.data();
+          isAdmin = currentUserData.isAdmin || false;
+          isBlocked = currentUserData.isBlocked || false;
+          enterChat();
+        }
+      }
+    });
+
+    // ---------- обработчики ----------
+    loginBtn.addEventListener('click', register);
+    sendBtn.addEventListener('click', () => sendMessage(msgInput.value, null));
+    msgInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(msgInput.value, null); } });
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const b64 = await fileToBase64(file).catch(() => null);
+        if (b64) await sendMessage(null, b64);
+        fileInput.value = '';
+      }
+    });
+  </script>
+</body>
+</html>
